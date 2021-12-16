@@ -1,0 +1,273 @@
+*debugpy.txt*  Debug Python code in Neovim
+                                                                     *debugpy*
+ ____       _                                          _~
+|  _ \  ___| |__  _   _  __ _ _ __  _   _   _ ____   _(_)_ __ ___~
+| | | |/ _ \ '_ \| | | |/ _` | '_ \| | | | | '_ \ \ / / | '_ ` _ \~
+| |_| |  __/ |_) | |_| | (_| | |_) | |_| |_| | | \ V /| | | | | | |~
+|____/ \___|_.__/ \__,_|\__, | .__/ \__, (_)_| |_|\_/ |_|_| |_| |_|~
+                        |___/|_|    |___/~
+
+
+Version: 0.1.0
+Author: Alejandro "HiPhish" Sanchez
+License: MIT License
+
+
+
+==============================================================================
+TABLE OF CONTENTS                                           *debugpy-contents*
+
+
+    1. Introduction ........................................ |debugpy-intro|
+    2. Setup and configuration ............................. |debugpy-setup|
+    3. Using ............................................... |debugpy-using|
+       3.1 Launch a process ................................ |debugpy-launch|
+       3.2 Attach to running process ....................... |debugpy-attach|
+       3.2 Attach to remote process ........................ |debugpy-ssh|
+    4. Debugpy API ......................................... |debugpy-api|
+    5. Further reading ..................................... |debugpy-seealso|
+
+
+==============================================================================
+INTRODUCTION                                                   *debugpy-intro*
+
+Debugpy is a Python debug adapter server which implements the server side of
+the Debug Adapter Protocol (DAP). The nvim-dap plugin (|dap.txt|) is a Neovim
+plugin which implements the client side of DAP.
+
+Debugpy.nvim provides the |:Debugpy| command which will create the appropriate
+debugger configurations for you and launch the debugger. You do not have to
+set up Debugpy yourself.
+
+Only launching the debugger is covered, it is up to your own configuration how
+to use the debugger once it is running. This allows debugpy.nvim to integrate
+into your workflow.
+
+
+==============================================================================
+SETUP AND CONFIGURATION                                        *debugpy-setup*
+
+Install debugpy.nvim like any other Neovim plugin. Make sure that nvim-dap and
+Debugpy are already working on your system.
+
+                                                              *debugpy-launch*
+We can try it out with a simple Python script. Create a new Python module
+named `main.py` with the following contents:
+>
+    def add(x, y):
+        """Recursively add two positive numbers"""
+        if y == 0:
+            return x
+        return add(x + 1, y - 1)
+
+
+    if __name__ == '__main__':
+    	x, y = 2, 3
+    	print(f'The sum of {x} and {y} is {add(x, y)}.')
+<
+Make sure Debugpy is installed in your environment. Open the script in Neovim,
+create a breakpoint (see |dap.set_breakpoint()|) somewhere (e.g. line 3) and
+execute the `:Debugpy module main` command. The debugger will run the module
+and stop at your breakpoint.
+
+                                                              *debugpy-attach*
+
+It is possible to attach the debugger to a running process through the
+sub-command |:Debugpy-attach|. To try it out create a new Python module named
+`server.py` with the following contents:
+>
+    import time
+    import random
+    import debugpy
+
+    (host, port) = debugpy.listen(5678)
+
+    print(f'Debugpy: Listening on {host}:{port}')
+
+    if __name__ == '__main__':
+    	while True:
+            x, y = random.randint(1, 10), random.randint(1, 10)
+            print(f'The sum of {x} and {y} is {x + y}.')
+            time.sleep(1)
+<
+Now launch this script from the shell and you will have an endlessly running
+Python process. Open the script in Neovim (in another shell), set your
+breakpoint somewhere inside the loop (e.g. line 13), then execute the
+`:Debugpy attach 127.0.0.1 5678` command (you do have to spell out the IP, you
+cannot write `localhost`). The debugger will stop at your breakpoint on the
+next loop iteration.
+
+It is also possible to listen for DAP clients without modifying the source
+code by launching the Python program through Debugpy itself. Please refer to
+the Debugpy command line reference for more information. Example:
+>
+    # Debug module 'main' with arguments 'foo' and 'bar'
+    python -m debugpy --listen 5678 -m main foo bar
+<
+
+                                                                 *debugpy-ssh*
+
+It is possible to debug a process running on a remote machine following the
+above instructions as long as you have local port forwarding set up. When
+attaching specify `127.0.0.1` as the host and the forwarded port as the port.
+Example:
+>
+    # In one shell connect to the remote machine
+    ssh -L 5678:localhost:5678 user@remote
+    # Navigate to the project on the remote machine
+    cd /home/jdoe/projects/my-project/
+    # Run the program
+    python -m main
+<
+You can now use |:Debugpy-attach| to start the debugger on your local machine.
+It is important that both machines have the same source code and ideally the
+same version of Debugpy.
+
+
+==============================================================================
+USING                                                          *debugpy-using*
+
+There is one new command (|:Debugpy|) which takes a number of arguments and
+starts the debugger with an appropriate configuration
+
+                                                                    *:Debugpy*
+:Debugpy {subcmd} [{arg} ...]
+:Debugpy
+
+    Start the debugger with a configuration based on the {subcmd} and its
+    arguments. For convenience if you execute `:Debugpy` without any arguments
+    the last invocation will be re-used. This does not persist between Neovim
+    sessions, you have to execute the command at least once with arguments.
+
+    The following sub-commands are implemented by defaut:
+
+    	- |:Debugpy-module|   run a single Python module)
+    	- |:Debugpy-program|  run a Python program)
+    	- |:Debugpy-attach|   attach to a running Python process)
+
+    You can add your own sub-commands or modify the existing ones through the
+    |debugpy-api|.
+
+
+------------------------------------------------------------------------------
+                                                             *:Debugpy-module*
+:Debugpy module {module} [{arg} ...]
+
+    Debug a specific Python module. The argument must be given the same way as
+    if you were running via `python -m {module}` it from the command line. The
+    remaining arguments are passed as command-line arguments to Python.
+
+    Example:
+>
+    	Debugpy module main foo bar
+>
+
+
+------------------------------------------------------------------------------
+                                                            *:Debugpy-program*
+:Debugpy program [{program} [{arg} ...]]
+
+    Debug a {program} given its absolute path or path relative to the current
+    working directory. The remaining {arg}s are passed as command-line
+    arguments to Python.
+
+    If the {program} is omitted the current file will be used as the program.
+
+    Example:
+>
+    	" Path relative to current working directory
+    	Debugpy program main.py foo bar
+
+    	" Absolute path
+    	Debugpy program /home/jdoe/projects/my-project/main.py foo bar
+>
+
+
+------------------------------------------------------------------------------
+                                                             *:Debugpy-attach*
+:Debugpy attach {host} {port}
+
+    Attach to a running Python process which is listening for DAP clients.
+    First you need to launch the process in a separate shell and have it
+    listen for DAP client connections. Once you know the {host} and {port} you
+    can attach to the process.
+
+    Note
+    	If the process is running on a remote you must be editing the same
+    	source code as what is running on the remote machine.
+
+    Note
+    	You cannot use `localhost` as the host, you have to spell out the IP
+    	`127.0.0.1` instead.
+
+    See |debugpy-attach| and |debugpy-ssh| for examples.
+
+
+==============================================================================
+API                                                              *debugpy-api*
+
+Debugpy is hackable, you can customize the default of debugpy.nvim by settings
+the values within its public module `debugpy`.
+
+
+------------------------------------------------------------------------------
+                                                                 *debugpy.run*
+debugpy.run({config})
+
+    Callback function to run the debugger with the final configuration (see
+    |dap-configuration|). The default implementations calls |dap.run|.
+
+
+------------------------------------------------------------------------------
+                                                  *debugpy.adapter*
+                                                  *debugpy.adapter.executable*
+                                                  *debugpy.adapter.server*
+
+The default adapters (|dap-adapter|), one for launching Python processes and
+one for attaching to running processes. These will be automatically registered
+as `debugpy_executable` and `debugpy_server` respectively, unless such an
+adapter is already defined.
+
+
+------------------------------------------------------------------------------
+                                                          *debugpy.subcommand*
+                                                        *g:debugpy_subcommand*
+
+This variable is a Lua table or a Vim script dictionary, both can exist at the
+same time. The key is the name of a sub-command, the value is its
+specification.
+
+Each specification has the following entries:
+
+    'arity'      A table or dictionary describing the arity of the
+                 sub-command; the entry 'min' is mandatory, the entry 'max' is
+                 optional (unlimited upper arity if omitted)
+
+    'configure'  A function which takes the arguments (as strings) from the
+                 sub-command and returns a configuration table according to
+                 |dap-configuration|
+
+You can define sub-commands in either Vim script or Lua, both work equally. If
+a subcommand in defined in both it is undefined which one will be chosen.
+
+
+==============================================================================
+FURTHER READING                                              *debugpy-seealso*
+
+Offical Debugpy website:
+    https://github.com/microsoft/debugpy
+
+Debugpy Wiki:
+    https://github.com/microsoft/debugpy/wiki
+
+nvim-dap:
+    https://github.com/mfussenegger/nvim-dap
+
+nvim-dap manual:
+    |dap.txt|
+
+Official DAP website:
+    https://microsoft.github.io/debug-adapter-protocol/
+
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
