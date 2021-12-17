@@ -60,4 +60,4 @@ LICENSE file for more information.
 
 .. _nvim-dap: https://github.com/mfussenegger/nvim-dap
 .. _Debugpy: https://github.com/microsoft/debugpy
-.. _documentations: doc/debugpy.txt
+.. _documentation: doc/debugpy.txt
