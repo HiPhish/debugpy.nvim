@@ -9,7 +9,39 @@ if !has_key(g:, 'debugpy_subcommand')
 	let g:debugpy_subcommand = {}
 endif
 
-command! -nargs=* -complete=customlist,<SID>complete Debugpy call debugpy#run(<f-args>)
+command! -nargs=* -complete=customlist,<SID>complete Debugpy call s:debugpy(<f-args>)
+
+" Shortcut, save the last invocation here so we can re-call it if no arguments
+" are given to the main command.
+let s:cmd  = ''
+let s:args = []
+
+" The backbone of the plugin, this function picks the configuration and
+" invokes the DAP plugin.
+function! s:debugpy(...) abort
+	" If no arguments are given we repeat the previous invocation; if there
+	" was no previous invocation we display an error.
+	if a:0 == 0
+		if empty(s:cmd)
+			call s:err('Debugpy: at least one argument needed')
+			return
+		endif
+	else
+		let s:cmd  = a:1
+		let s:args = a:000[1:]
+	endif
+
+	try
+		let l:config = call(function('debugpy#configure'), [s:cmd] + s:args)
+	catch /\vDebugpy: /
+		" Lua inserts a stack trace into the message; we have to extract the
+		" message again
+		call s:err(matchstr(split(v:exception, "\n")[0], '\vDebugpy: .*'))
+		return
+	endtry
+
+	call debugpy#run(l:config)
+endfunction
 
 function! s:complete(arg_lead, cmd_line, cursor_pos)
 	" Abort if the sub-command has been completed (more than two arguments).
@@ -25,6 +57,12 @@ function! s:complete(arg_lead, cmd_line, cursor_pos)
 		\ keys(get(g:, 'debugpy_subcommand', {})),
 		\ 'keep')
 	return sort(filter(keys, {_,v -> match(v, '\v^' .. a:arg_lead) >= 0}))
+endfunction
+
+function! s:err(msg)
+	echohl ErrorMsg
+	echo a:msg
+	echohl None
 endfunction
 
 let &cpo = s:save_cpo

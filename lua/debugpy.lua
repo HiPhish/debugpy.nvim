@@ -77,4 +77,29 @@ function M.run(final_config)
 	dap.run(final_config)
 end
 
+function M.configure(subcommand, ...)
+	local entry = M.subcommand[subcommand]
+		or vim.g.debugpy_subcommand[subcommand]
+
+	if not entry then
+		error(string.format('Debugpy: invalid subcommand %s', subcommand))
+	end
+
+	local args = {...}
+	local min_args, max_args = entry.arity.min, entry.arity.max
+	if #args < min_args then
+		error(string.format(
+			'Debugpy: %s: not enough arguments, needs at least %d, got %d',
+			subcommand, min_args, #args))
+	end
+
+	if max_args and #args > max_args then
+		error(string.format(
+			'Debugpy: %s: too many arguments, needs at most %d, got %d',
+			subcommand, max_args, #args))
+	end
+
+	return entry.configure(...)
+end
+
 return M

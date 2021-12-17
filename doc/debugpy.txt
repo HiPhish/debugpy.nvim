@@ -1,4 +1,4 @@
-*debugpy.txt*  Debug Python code in Neovim
+*debugpy.txt*	Debug Python code in Neovim
                                                                      *debugpy*
  ____       _                                          _~
 |  _ \  ___| |__  _   _  __ _ _ __  _   _   _ ____   _(_)_ __ ___~
@@ -8,7 +8,7 @@
                         |___/|_|    |___/~
 
 
-Version: 0.1.0
+Version: 0.2.0
 Author: Alejandro "HiPhish" Sanchez
 License: MIT License
 
@@ -211,11 +211,69 @@ the values within its public module `debugpy`.
 
 
 ------------------------------------------------------------------------------
-                                                                 *debugpy.run*
+                                                            *g:loaded_debugpy*
+
+Set this variable to a |TRUE| value before the plugin has been loaded to
+prevent it from loading. The API will still work, it is lazy-loaded.
+
+
+------------------------------------------------------------------------------
+                                                               *debugpy.run()*
 debugpy.run({config})
 
     Callback function to run the debugger with the final configuration (see
-    |dap-configuration|). The default implementations calls |dap.run|.
+    |dap-configuration|) which you can replace with your implementation. The
+    default implementations calls |dap.run|.
+
+    Example: Lua
+>
+	-- Your personal default settings
+	default = { justMyCode = false }
+
+	-- Implementation which injects your default settings
+	require('debugpy').run = function(config)
+	    local final = vim.tbl_extend('keep', config, default)
+	    require('dap').run(final)
+	end
+<
+    You can also call this function directly to run the debugger. Example:
+>
+	local debugpy = require 'debugpy'
+	local config = debugpy.configure('attach', '127.0.0.1', '5678')
+
+	debugpy.run(config)
+<
+                                                               *debugpy#run()*
+debugpy#run({config})
+
+    Vim script wrapper around |debugpy.run()|. Do not overwrite this
+    implementation, overwrite |debugpy.run()| in Lua instead.
+
+
+------------------------------------------------------------------------------
+                                                         *debugpy.configure()*
+                                                         *debugpy#configure()*
+debugpy.configure({subcmd}[, {arg} ...])
+debugpy#configure({subcmd}[, {arg} ...])
+
+    Takes a subcommand string {subcmd} and any number of string {arg}uments,
+    returns the final |dap-configuration|. The function does check the arity
+    of the subcommand, it is an error to supply the wrong number of arguments.
+
+    There is a Lua function and a Vim script function.
+
+    Example: Lua
+>
+	-- Manually configure and start the debugger
+	local c = require('debugpy').configure('attach', '127.0.0.1, '5678')
+	require('dap').run(c)
+<
+    Example: Vim script
+>
+	" Manually configure and start the debugger
+	let c = debugpy#configure('attach', '127.0.0.1, '5678')
+	call luaeval('require("dap").run')(c)
+<
 
 
 ------------------------------------------------------------------------------
