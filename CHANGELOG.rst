@@ -11,6 +11,14 @@ The format is based on `Keep a Changelog`_ and this project adheres to
 `Semantic Versioning`_.
 
 
+Unreleased
+##########
+
+Fixed
+   - `debugpy#configure()` does not raise any errors
+   - `debugpy#run()` does not raise any errors
+
+
 0.2.0 - 2021-12-17
 ##################
 

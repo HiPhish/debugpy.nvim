@@ -1,0 +1,65 @@
+# ===[ CORRECT CONFIGURATION ]=================================================
+
+After:
+  if exists('config') | unlet config | endif
+
+
+Execute (Configure module):
+  let config = debugpy#configure('module', 'my-module', 'arg1', 'arg2')
+Then (Configuration has required keys):
+  AssertEqual config['type'], 'debugpy_executable'
+  AssertEqual config['request'], 'launch'
+  AssertEqual config['module'], 'my-module'
+  AssertEqual config['args'], ['arg1', 'arg2']
+
+
+Execute (Configure module without arguments):
+  let config = debugpy#configure('module', 'my-module')
+Then (Configuration has required keys):
+  AssertEqual config['type'], 'debugpy_executable'
+  AssertEqual config['request'], 'launch'
+  AssertEqual config['module'], 'my-module'
+  AssertEqual config['args'], []
+
+
+Execute (Configure program):
+  let config = debugpy#configure('program', 'my-program', 'arg1', 'arg2')
+Then (Configuration has required keys):
+  AssertEqual config['type'], 'debugpy_executable'
+  AssertEqual config['request'], 'launch'
+  AssertEqual config['program'], 'my-program'
+  AssertEqual config['args'], ['arg1', 'arg2']
+
+
+Execute (Configure program without arguments):
+  let config = debugpy#configure('program', 'my-program')
+Then (Configuration has required keys):
+  AssertEqual config['type'], 'debugpy_executable'
+  AssertEqual config['request'], 'launch'
+  AssertEqual config['program'], 'my-program'
+  AssertEqual config['args'], []
+
+
+Execute (Configure program with implicit program):
+  let config = debugpy#configure('program')
+Then (Configuration has required keys):
+  AssertEqual config['type'], 'debugpy_executable'
+  AssertEqual config['request'], 'launch'
+  AssertEqual config['program'], '${file}'
+  AssertEqual config['args'], []
+
+
+Execute (Configure attaching to remote):
+  let config = debugpy#configure('attach', '127.0.0.1', '5678')
+Then (Configuration has required keys):
+  AssertEqual config['type'], 'debugpy_server'
+  AssertEqual config['request'], 'attach'
+  AssertEqual config['host'], '127.0.0.1'
+  AssertEqual config['port'], 5678
+
+
+Execute (Error is raised when arity does not match):
+  AssertThrows call debugpy#configure('module')
+  AssertThrows call debugpy#configure('attach')
+  AssertThrows call debugpy#configure('attach', '127.0.0.1')
+  AssertThrows call debugpy#configure('attach', '127.0.0.1', '5678', 'arg1')

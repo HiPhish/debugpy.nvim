@@ -2,13 +2,11 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 function! debugpy#configure(subcmd, ...)
-	let l:Configure = luaeval('require("debugpy").configure')
-	return call(l:Configure, [a:subcmd] + a:000)
+	return luaeval('require("debugpy").configure(_A[1], unpack(_A[2]))', [a:subcmd, a:000])
 endfunction
 
 function! debugpy#run(config)
-	let l:Run = luaeval('require("debugpy").run')
-	call l:Run(a:config)
+	call luaeval('require("debugpy").run(_A)', a:config)
 endfunction
 
 let &cpo = s:save_cpo
