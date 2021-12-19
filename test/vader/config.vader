@@ -49,6 +49,14 @@ Then (Configuration has required keys):
   AssertEqual config['args'], []
 
 
+Execute (Configure running a code snippet):
+  let config = debugpy#configure('code', 'from foo import bar; bar()')
+Then (Configuration has required keys):
+  AssertEqual config['type'], 'debugpy_executable'
+  AssertEqual config['request'], 'launch'
+  AssertEqual config['code'], 'from foo import bar; bar()'
+
+
 Execute (Configure attaching to remote):
   let config = debugpy#configure('attach', '127.0.0.1', '5678')
 Then (Configuration has required keys):

@@ -14,6 +14,9 @@ The format is based on `Keep a Changelog`_ and this project adheres to
 Unreleased
 ##########
 
+Added
+   - Subcommand `code`
+
 Fixed
    - `debugpy#configure()` does not raise any errors
    - `debugpy#run()` does not raise any errors

@@ -104,7 +104,6 @@ the Debugpy command line reference for more information. Example:
     # Debug module 'main' with arguments 'foo' and 'bar'
     python -m debugpy --listen 5678 -m main foo bar
 <
-
                                                                  *debugpy-ssh*
 
 It is possible to debug a process running on a remote machine following the
@@ -141,9 +140,10 @@ starts the debugger with an appropriate configuration
 
     The following sub-commands are implemented by defaut:
 
-    	- |:Debugpy-module|   run a single Python module)
-    	- |:Debugpy-program|  run a Python program)
-    	- |:Debugpy-attach|   attach to a running Python process)
+    	- |:Debugpy-module|   Run a single Python module
+    	- |:Debugpy-program|  Run a Python program
+    	- |:Debugpy-code|     Run a code snippet
+    	- |:Debugpy-attach|   Attach to a running Python process)
 
     You can add your own sub-commands or modify the existing ones through the
     |debugpy-api|.
@@ -182,6 +182,26 @@ starts the debugger with an appropriate configuration
     	Debugpy program /home/jdoe/projects/my-project/main.py foo bar
 >
 
+
+------------------------------------------------------------------------------
+                                                               *:Debugpy-code*
+:Debugpy code {code}
+
+    Debug the given snippet of source code. This is rather awkward to use from
+    the command line because you need to escape all special characters (see
+    |cmdline-special|).
+
+    Example:
+>
+	" A code snippet which jumps straight into a function call
+	Debugpy code from\ foo\ import\ bar;\ bar(1,\ 2)
+<
+    This sub-command is much easier to use in the |debugpy-api|. Here is the
+    same example as above, but using the API instead:
+>
+	let conf = debugpy#configure('code', 'from foo import bar; bar(1, 2)')
+	call debugpy#run(conf)
+<
 
 ------------------------------------------------------------------------------
                                                              *:Debugpy-attach*

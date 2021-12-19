@@ -34,6 +34,16 @@ M.subcommand = {
 			}
 		end,
 	},
+	code = {
+		arity = {min = 1, max = 1},
+		configure = function(code)
+			return {
+				type = 'debugpy_executable',
+				request = 'launch',
+				code = code
+			}
+		end
+	},
 	attach = {
 		arity = {min = 2, max = 2},
 		configure = function(host, port)
