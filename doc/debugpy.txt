@@ -109,6 +109,7 @@ the Debugpy command line reference for more information. Example:
 It is possible to debug a process running on a remote machine following the
 above instructions as long as you have local port forwarding set up. When
 attaching specify `127.0.0.1` as the host and the forwarded port as the port.
+
 Example:
 >
     # In one shell connect to the remote machine
@@ -162,7 +163,6 @@ starts the debugger with an appropriate configuration
     	Debugpy module main foo bar
 >
 
-
 ------------------------------------------------------------------------------
                                                             *:Debugpy-program*
 :Debugpy program [{program} [{arg} ...]]
@@ -182,7 +182,6 @@ starts the debugger with an appropriate configuration
     	Debugpy program /home/jdoe/projects/my-project/main.py foo bar
 >
 
-
 ------------------------------------------------------------------------------
                                                                *:Debugpy-code*
 :Debugpy code {code}
@@ -197,10 +196,19 @@ starts the debugger with an appropriate configuration
 	Debugpy code from\ foo\ import\ bar;\ bar(1,\ 2)
 <
     This sub-command is much easier to use in the |debugpy-api|. Here is the
-    same example as above, but using the API instead:
+    same example as above, but using the API instead.
+
+    Example: Vim script
 >
 	let conf = debugpy#configure('code', 'from foo import bar; bar(1, 2)')
 	call debugpy#run(conf)
+<
+    Example: Lua
+>
+	local debugpy = require 'debugpy'
+
+	local conf = debugpy.configure('code', 'from foo import bar; bar(1, 2)')
+	debugpy.run(conf)
 <
 
 ------------------------------------------------------------------------------
@@ -269,6 +277,11 @@ debugpy#run({config})
     Vim script wrapper around |debugpy.run()|. Do not overwrite this
     implementation, overwrite |debugpy.run()| in Lua instead.
 
+    Example:
+>
+	let config = debugpy#configure('attach', '127.0.0.1', '5678')
+	call debugpy#run(config)
+
 
 ------------------------------------------------------------------------------
                                                          *debugpy.configure()*
@@ -284,17 +297,15 @@ debugpy#configure({subcmd}[, {arg} ...])
 
     Example: Lua
 >
-	-- Manually configure and start the debugger
-	local c = require('debugpy').configure('attach', '127.0.0.1, '5678')
-	require('dap').run(c)
+	-- Manually configure
+	local debugpy = require 'debugpy'
+	local config = debugpy.configure('attach', '127.0.0.1, '5678')
 <
     Example: Vim script
 >
-	" Manually configure and start the debugger
-	let c = debugpy#configure('attach', '127.0.0.1, '5678')
-	call luaeval('require("dap").run')(c)
+	" Manually configure
+	let config = debugpy#configure('attach', '127.0.0.1, '5678')
 <
-
 
 ------------------------------------------------------------------------------
                                                   *debugpy.adapter*
@@ -328,6 +339,20 @@ Each specification has the following entries:
 You can define sub-commands in either Vim script or Lua, both work equally. If
 a subcommand in defined in both it is undefined which one will be chosen.
 
+Example: Lua
+>
+    local code = {
+        arity = {min = 1, max = 1},
+        configure = function(code)
+            return {
+                type = 'debugpy_executable',
+                request = 'launch',
+                code = code
+            }
+        end
+    },
+<
+
 
 ==============================================================================
 FURTHER READING                                              *debugpy-seealso*
@@ -346,6 +371,7 @@ nvim-dap manual:
 
 Official DAP website:
     https://microsoft.github.io/debug-adapter-protocol/
+
 
 ==============================================================================
  vim:tw=78:ts=8:ft=help:norl:
