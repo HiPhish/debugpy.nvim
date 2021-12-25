@@ -11,8 +11,10 @@ The format is based on `Keep a Changelog`_ and this project adheres to
 `Semantic Versioning`_.
 
 
-Unreleased
-##########
+0.4.0 - 2021-12-25
+##################
+
+Christmas gift release!
 
 Added
    - Support for completion of subcommands
