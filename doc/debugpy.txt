@@ -62,8 +62,8 @@ named `main.py` with the following contents:
 
 
     if __name__ == '__main__':
-    	x, y = 2, 3
-    	print(f'The sum of {x} and {y} is {add(x, y)}.')
+        x, y = 2, 3
+        print(f'The sum of {x} and {y} is {add(x, y)}.')
 <
 Make sure Debugpy is installed in your environment. Open the script in Neovim,
 create a breakpoint (see |dap.set_breakpoint()|) somewhere (e.g. line 3) and
@@ -85,7 +85,7 @@ sub-command |:Debugpy-attach|. To try it out create a new Python module named
     print(f'Debugpy: Listening on {host}:{port}')
 
     if __name__ == '__main__':
-    	while True:
+        while True:
             x, y = random.randint(1, 10), random.randint(1, 10)
             print(f'The sum of {x} and {y} is {x + y}.')
             time.sleep(1)
@@ -141,10 +141,10 @@ starts the debugger with an appropriate configuration
 
     The following sub-commands are implemented by defaut:
 
-    	- |:Debugpy-module|   Run a single Python module
-    	- |:Debugpy-program|  Run a Python program
-    	- |:Debugpy-code|     Run a code snippet
-    	- |:Debugpy-attach|   Attach to a running Python process)
+        - |:Debugpy-module|   Run a single Python module
+        - |:Debugpy-program|  Run a Python program
+        - |:Debugpy-code|     Run a code snippet
+        - |:Debugpy-attach|   Attach to a running Python process)
 
     You can add your own sub-commands or modify the existing ones through the
     |debugpy-api|.
@@ -160,7 +160,7 @@ starts the debugger with an appropriate configuration
 
     Example:
 >
-    	Debugpy module main foo bar
+        Debugpy module main foo bar
 >
 
 ------------------------------------------------------------------------------
@@ -175,11 +175,11 @@ starts the debugger with an appropriate configuration
 
     Example:
 >
-    	" Path relative to current working directory
-    	Debugpy program main.py foo bar
+        " Path relative to current working directory
+        Debugpy program main.py foo bar
 
-    	" Absolute path
-    	Debugpy program /home/jdoe/projects/my-project/main.py foo bar
+        " Absolute path
+        Debugpy program /home/jdoe/projects/my-project/main.py foo bar
 >
 
 ------------------------------------------------------------------------------
@@ -192,23 +192,23 @@ starts the debugger with an appropriate configuration
 
     Example:
 >
-	" A code snippet which jumps straight into a function call
-	Debugpy code from\ foo\ import\ bar;\ bar(1,\ 2)
+        " A code snippet which jumps straight into a function call
+        Debugpy code from\ foo\ import\ bar;\ bar(1,\ 2)
 <
     This sub-command is much easier to use in the |debugpy-api|. Here is the
     same example as above, but using the API instead.
 
     Example: Vim script
 >
-	let conf = debugpy#configure('code', 'from foo import bar; bar(1, 2)')
-	call debugpy#run(conf)
+        let conf = debugpy#configure('code', 'from foo import bar; bar(1, 2)')
+        call debugpy#run(conf)
 <
     Example: Lua
 >
-	local debugpy = require 'debugpy'
+        local debugpy = require 'debugpy'
 
-	local conf = debugpy.configure('code', 'from foo import bar; bar(1, 2)')
-	debugpy.run(conf)
+        local conf = debugpy.configure('code', 'from foo import bar; bar(1, 2)')
+        debugpy.run(conf)
 <
 
 ------------------------------------------------------------------------------
@@ -221,12 +221,12 @@ starts the debugger with an appropriate configuration
     can attach to the process.
 
     Note
-    	If the process is running on a remote you must be editing the same
-    	source code as what is running on the remote machine.
+        If the process is running on a remote you must be editing the same
+        source code as what is running on the remote machine.
 
     Note
-    	You cannot use `localhost` as the host, you have to spell out the IP
-    	`127.0.0.1` instead.
+        You cannot use `localhost` as the host, you have to spell out the IP
+        `127.0.0.1` instead.
 
     See |debugpy-attach| and |debugpy-ssh| for examples.
 
@@ -255,21 +255,21 @@ debugpy.run({config})
 
     Example: Lua
 >
-	-- Your personal default settings
-	default = { justMyCode = false }
+        -- Your personal default settings
+        default = { justMyCode = false }
 
-	-- Implementation which injects your default settings
-	require('debugpy').run = function(config)
-	    local final = vim.tbl_extend('keep', config, default)
-	    require('dap').run(final)
-	end
+        -- Implementation which injects your default settings
+        require('debugpy').run = function(config)
+            local final = vim.tbl_extend('keep', config, default)
+            require('dap').run(final)
+        end
 <
     You can also call this function directly to run the debugger. Example:
 >
-	local debugpy = require 'debugpy'
-	local config = debugpy.configure('attach', '127.0.0.1', '5678')
+        local debugpy = require 'debugpy'
+        local config = debugpy.configure('attach', '127.0.0.1', '5678')
 
-	debugpy.run(config)
+        debugpy.run(config)
 <
                                                                *debugpy#run()*
 debugpy#run({config})
@@ -279,8 +279,8 @@ debugpy#run({config})
 
     Example:
 >
-	let config = debugpy#configure('attach', '127.0.0.1', '5678')
-	call debugpy#run(config)
+        let config = debugpy#configure('attach', '127.0.0.1', '5678')
+        call debugpy#run(config)
 
 
 ------------------------------------------------------------------------------
@@ -297,14 +297,14 @@ debugpy#configure({subcmd}[, {arg} ...])
 
     Example: Lua
 >
-	-- Manually configure
-	local debugpy = require 'debugpy'
-	local config = debugpy.configure('attach', '127.0.0.1, '5678')
+        -- Manually configure
+        local debugpy = require 'debugpy'
+        local config = debugpy.configure('attach', '127.0.0.1, '5678')
 <
     Example: Vim script
 >
-	" Manually configure
-	let config = debugpy#configure('attach', '127.0.0.1, '5678')
+        " Manually configure
+        let config = debugpy#configure('attach', '127.0.0.1, '5678')
 <
 
 ------------------------------------------------------------------------------
@@ -335,12 +335,18 @@ Each specification has the following entries:
     'configure'  A function which takes the arguments (as strings) from the
                  sub-command and returns a configuration table according to
                  |dap-configuration|
+    'complete'   A function which takes a list of string arguments to complete
+                 the subcommand and a boolean whether the current argument is
+                 incomplete, returns a list of completion candidates. The
+                 arguments are the same arguments which are being passed to
+                 the `:Debugpy` command following the subcommand.
 
 You can define sub-commands in either Vim script or Lua, both work equally. If
 a subcommand in defined in both it is undefined which one will be chosen.
 
 Example: Lua
 >
+    -- Fixed arity
     local code = {
         arity = {min = 1, max = 1},
         configure = function(code)
@@ -350,7 +356,29 @@ Example: Lua
                 code = code
             }
         end
-    },
+    }
+
+    -- Variable arity, completion function
+    local program = {
+        arity = {min = 0},
+        configure = function(program, ...)
+            return {
+                type = 'debugpy_executable',
+                request = 'launch',
+                program = program or '${file},
+                args = {...}
+            }
+        end,
+        completion = function(args, arg_pending)
+            -- Only complete the first argument, stop if it is complete
+            if #args > 1 or (#args == 1 and not arg_pending) then
+                return {}
+            end
+            -- For a real implementation you need to escape whitespace in the
+            -- result entries
+            return vim.fn.getcompletion(args[1] or '', 'file')
+        end
+    }
 <
 
 

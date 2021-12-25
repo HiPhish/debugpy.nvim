@@ -33,6 +33,16 @@ M.subcommand = {
 				args = {...},
 			}
 		end,
+		complete = function(args, pending)
+			if #args > 1 or (#args == 1 and not pending) then
+				return {}
+			end
+			local result = vim.fn.getcompletion(args[1] or '', 'file')
+			for i, v in ipairs(result) do
+				result[i] = vim.fn.escape(v, ' \\')
+			end
+			return result
+		end
 	},
 	code = {
 		arity = {min = 1, max = 1},
@@ -64,6 +74,16 @@ M.subcommand = {
 			}
 		end
 	},
+	-- Disbled for now; it would be better to support the launch.json file from
+	-- VSCode
+	--
+	-- json = {
+	-- 	arity = {min = 1, max = 2},
+	-- 	configure = function(path, key)
+	-- 		local json = vim.fn.json_decode(vim.fn.readfile(path))
+	-- 		return key and json[key] or json
+	-- 	end
+	-- },
 }
 
 M.adapter = {
