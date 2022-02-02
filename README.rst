@@ -14,11 +14,15 @@ Installation
 ############
 
 - Set up nvim-dap to your likings
+- Install the Debugpy adapter into your Python environment
 - Install Debugpy.nvim like any other Neovim plugin
 
+You can run the health check (`:checkhealth debugpy`) to verify that all
+dependencies are available.
+
 I recommend running nvim-dap manually first to make sure it works before
-invoking the `:Debugpy` command from this plugin. Debugpy.nvim provides only a
-way of starting the debugger, it does not interfere with other aspects of the
+invoking the `:Debugpy` command from this plugin. It provides only a way of
+starting the debugger, it does not interfere with other aspects of the
 debugger.
 
 A reasonable default adapter configuration named `debugpy` is provided, but you
@@ -56,8 +60,9 @@ License
 #######
 
 Licensed under the terms of the MIT (Expat) license. Please refer to the
-LICENSE file for more information.
+LICENSE_ file for more information.
 
 .. _nvim-dap: https://github.com/mfussenegger/nvim-dap
 .. _Debugpy: https://github.com/microsoft/debugpy
 .. _documentation: doc/debugpy.txt
+.. _License: LICENSE.txt

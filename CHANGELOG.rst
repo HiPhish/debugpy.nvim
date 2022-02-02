@@ -11,6 +11,13 @@ The format is based on `Keep a Changelog`_ and this project adheres to
 `Semantic Versioning`_.
 
 
+Unreleased
+##########
+
+Added
+   - Health check
+
+
 0.4.0 - 2021-12-25
 ##################
 
