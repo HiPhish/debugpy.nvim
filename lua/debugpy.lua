@@ -104,7 +104,7 @@ M.adapter = {
 ---Function to run the debugger with a complete configuration. The default
 ---implementation calls `dap.run`.
 function M.run(final_config)
-	dap.run(final_config)
+  vim.schedule(function() dap.run(final_config) end)
 end
 
 function M.configure(subcommand, ...)
