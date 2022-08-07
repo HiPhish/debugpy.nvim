@@ -13,7 +13,7 @@ on the fly.
 Installation
 ############
 
-- Set up nvim-dap to your likings
+- Set up nvim-dap to your liking
 - Install the Debugpy adapter into your Python environment
 - Install Debugpy.nvim like any other Neovim plugin
 

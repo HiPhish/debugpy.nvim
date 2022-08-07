@@ -11,8 +11,8 @@ The format is based on `Keep a Changelog`_ and this project adheres to
 `Semantic Versioning`_.
 
 
-Unreleased
-##########
+0.6.0 - 2022-08-07
+##################
 
 Added
    - Default adapter for the name `python`
