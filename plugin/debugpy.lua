@@ -12,3 +12,7 @@ for kind, config in pairs(debugpy.adapter) do
 	local name = 'debugpy_' .. kind
 	if not dap.adapters[name] then dap.adapters[name] = config end
 end
+
+if not dap.adapters['python'] then
+	dap.adapters['python'] = debugpy.adapter.executable
+end

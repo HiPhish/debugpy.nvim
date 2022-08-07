@@ -8,7 +8,7 @@
                         |___/|_|    |___/~
 
 
-Version: 0.3.0
+Version: 0.5.0
 Author: Alejandro "HiPhish" Sanchez
 License: MIT License
 
@@ -23,9 +23,10 @@ TABLE OF CONTENTS                                           *debugpy-contents*
     3. Using ............................................... |debugpy-using|
        3.1 Launch a process ................................ |debugpy-launch|
        3.2 Attach to running process ....................... |debugpy-attach|
-       3.2 Attach to remote process ........................ |debugpy-ssh|
-    4. Debugpy API ......................................... |debugpy-api|
-    5. Further reading ..................................... |debugpy-seealso|
+       3.3 Attach to remote process ........................ |debugpy-ssh|
+    4  Included adapters ................................... |debugpy-adapter|
+    5. Debugpy API ......................................... |debugpy-api|
+    6. Further reading ..................................... |debugpy-seealso|
 
 
 ==============================================================================
@@ -232,6 +233,21 @@ starts the debugger with an appropriate configuration
 
 
 ==============================================================================
+INCLUDED ADAPTERS                                            *debugpy-adapter*
+
+There are two custom adapters included, see |debugpy.adapter|. Those two
+adapters will be automatically registered. For convenience the included
+adapters will be registered under the following names, unless there already is
+an adapter with that name.
+
+    `python`              |debugpy.adapter.executable| 
+    `debugpy_executable`  |debugpy.adapter.executable| 
+    `debugpy_server`      |debugpy.adapter.executable| 
+
+See |dap-adapter| for more information on adapters.
+
+
+==============================================================================
 API                                                              *debugpy-api*
 
 Debugpy is hackable, you can customize the default of debugpy.nvim by settings
@@ -309,14 +325,19 @@ debugpy#configure({subcmd}[, {arg} ...])
 
 ------------------------------------------------------------------------------
                                                   *debugpy.adapter*
+
+Table containing the adapters. See also |debugpy-adapter|.
+
+
                                                   *debugpy.adapter.executable*
+
+Adapter which launches a Python process.
+
+
                                                   *debugpy.adapter.server*
 
-The default adapters (|dap-adapter|), one for launching Python processes and
-one for attaching to running processes. These will be automatically registered
-as `debugpy_executable` and `debugpy_server` respectively, unless such an
-adapter is already defined.
-
+Adapter which attaches to a running Python process. See |debugpy-ssh| for
+instructions.
 
 ------------------------------------------------------------------------------
                                                           *debugpy.subcommand*
