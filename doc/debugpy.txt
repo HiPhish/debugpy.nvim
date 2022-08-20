@@ -18,16 +18,22 @@ License: MIT License
 TABLE OF CONTENTS                                           *debugpy-contents*
 
 
-    1. Introduction ........................................ |debugpy-intro|
-    2. Setup ............................................... |debugpy-setup|
-    3. Tutorial ............................................ |debugpy-tutorial|
-       3.1 Launching a process ............................. |debugpy-launch|
-       3.2 Attaching to running process .................... |debugpy-attach|
-       3.3 Attaching to remote process ..................... |debugpy-ssh|
-    4. Using ............................................... |debugpy-using|
-    5  Included adapters ................................... |debugpy-adapter|
-    6. Debugpy API ......................................... |debugpy-api|
-    7. Further reading ..................................... |debugpy-seealso|
+    1. Introduction ..................................... |debugpy-intro|
+    2. Setup ............................................ |debugpy-setup|
+    3. Tutorial ......................................... |debugpy-tutorial|
+       3.1 Launching a process .......................... |debugpy-launch|
+       3.2 Attaching to running process ................. |debugpy-attach|
+       3.3 Attaching to remote process .................. |debugpy-ssh|
+    4. Using ............................................ |debugpy-using|
+       4.1 The Debugpy command .......................... |:Debugpy|
+       4.2 Included adapters ............................ |debugpy-adapter|
+    6. Debugpy API ...................................... |debugpy-api|
+       6.1 Variables .................................... |debugpy-api-vars|
+       6.2 Running the debugger ......................... |debugpy-api-run|
+       6.3 Custom configuration ......................... |debugpy-api-config|
+       6.4 Adapters ..................................... |debugpy-api-adapt|
+       6.5 Custom sub-commands .......................... |debugpy-api-subcmd|
+    7. Further reading .................................. |debugpy-seealso|
 
 
 ==============================================================================
@@ -158,9 +164,14 @@ same version of Debugpy.
 USING                                                          *debugpy-using*
 
 There is one new command (|:Debugpy|) which takes a number of arguments and
-starts the debugger with an appropriate configuration
+starts the debugger with an appropriate configuration. Users who prefer more
+direct control can use the included adapters (|debugpy-adapter|) in their
+nvim-dap settings.
 
-                                                                    *:Debugpy*
+
+------------------------------------------------------------------------------
+THE DEBUGPY COMMAND                                                 *:Debugpy*
+
 :Debugpy {subcmd} [{arg} ...]
 :Debugpy
 
@@ -169,7 +180,7 @@ starts the debugger with an appropriate configuration
     the last invocation will be re-used. This does not persist between Neovim
     sessions, you have to execute the command at least once with arguments.
 
-    The following sub-commands are implemented by defaut:
+    The following sub-commands are implemented by default:
 
         - |:Debugpy-module|   Run a single Python module
         - |:Debugpy-program|  Run a Python program
@@ -261,7 +272,7 @@ starts the debugger with an appropriate configuration
     See |debugpy-attach| and |debugpy-ssh| for examples.
 
 
-==============================================================================
+------------------------------------------------------------------------------
 INCLUDED ADAPTERS                                            *debugpy-adapter*
 
 There are two custom adapters included, see |debugpy.adapter|. Those two
@@ -284,13 +295,18 @@ the values within its public module `debugpy`.
 
 
 ------------------------------------------------------------------------------
-                                                            *g:loaded_debugpy*
+VARIABLES                                                   *debugpy-api-vars*
 
+
+                                                            *g:loaded_debugpy*
 Set this variable to a |TRUE| value before the plugin has been loaded to
 prevent it from loading. The API will still work, it is lazy-loaded.
 
 
 ------------------------------------------------------------------------------
+RUNNING THE DEBUGGER                                         *debugpy-api-run*
+
+
                                                                *debugpy.run()*
 debugpy.run({config})
 
@@ -326,9 +342,12 @@ debugpy#run({config})
 >
         let config = debugpy#configure('attach', '127.0.0.1', '5678')
         call debugpy#run(config)
-
+<
 
 ------------------------------------------------------------------------------
+CUSTOM CONFIGURATION                                      *debugpy-api-config*
+
+
                                                          *debugpy.configure()*
                                                          *debugpy#configure()*
 debugpy.configure({subcmd}[, {arg} ...])
@@ -353,25 +372,36 @@ debugpy#configure({subcmd}[, {arg} ...])
 <
 
 ------------------------------------------------------------------------------
-                                                  *debugpy.adapter*
+ADAPTERS                                                 *debugpy-api-adapter*
 
+The following adapters can be used on their own with nvim-dap.
+
+
+                                                             *debugpy.adapter*
 Table containing the adapters. See also |debugpy-adapter|.
 
 
                                                   *debugpy.adapter.executable*
-
 Adapter which launches a Python process.
 
 
-                                                  *debugpy.adapter.server*
-
+                                                      *debugpy.adapter.server*
 Adapter which attaches to a running Python process. See |debugpy-ssh| for
 instructions.
 
+
 ------------------------------------------------------------------------------
+CUSTOM SUB-COMMANDS                                       *debugpy-api-subcmd*
+                                                       *debugpy-api-subcommad*
+
+The |:Debugpy| command takes as its first argument a sub-command such as
+`module`. This part of the API allows users to define their own sub-commands
+which integrate with the default ones. Each custom sub-command can have its
+own custom completion type.
+
+
                                                           *debugpy.subcommand*
                                                         *g:debugpy_subcommand*
-
 This variable is a Lua table or a Vim script dictionary, both can exist at the
 same time. The key is the name of a sub-command, the value is its
 specification.
@@ -380,11 +410,13 @@ Each specification has the following entries:
 
     'arity'      A table or dictionary describing the arity of the
                  sub-command; the entry 'min' is mandatory, the entry 'max' is
-                 optional (unlimited upper arity if omitted)
+                 optional (unlimited upper arity if omitted). If both values
+                 are the same the arity is fixed.
 
     'configure'  A function which takes the arguments (as strings) from the
                  sub-command and returns a configuration table according to
                  |dap-configuration|
+
     'complete'   A function which takes a list of string arguments to complete
                  the subcommand and a boolean whether the current argument is
                  incomplete, returns a list of completion candidates. The
