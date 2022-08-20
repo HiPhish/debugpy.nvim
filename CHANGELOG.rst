@@ -11,6 +11,13 @@ The format is based on `Keep a Changelog`_ and this project adheres to
 `Semantic Versioning`_.
 
 
+Unreleased
+##########
+
+Changed
+   - User manual topics restructured to be more discoverable
+
+
 0.6.0 - 2022-08-07
 ##################
 

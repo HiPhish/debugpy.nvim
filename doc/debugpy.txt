@@ -19,18 +19,20 @@ TABLE OF CONTENTS                                           *debugpy-contents*
 
 
     1. Introduction ........................................ |debugpy-intro|
-    2. Setup and configuration ............................. |debugpy-setup|
-    3. Using ............................................... |debugpy-using|
-       3.1 Launch a process ................................ |debugpy-launch|
-       3.2 Attach to running process ....................... |debugpy-attach|
-       3.3 Attach to remote process ........................ |debugpy-ssh|
-    4  Included adapters ................................... |debugpy-adapter|
-    5. Debugpy API ......................................... |debugpy-api|
-    6. Further reading ..................................... |debugpy-seealso|
+    2. Setup ............................................... |debugpy-setup|
+    3. Tutorial ............................................ |debugpy-tutorial|
+       3.1 Launching a process ............................. |debugpy-launch|
+       3.2 Attaching to running process .................... |debugpy-attach|
+       3.3 Attaching to remote process ..................... |debugpy-ssh|
+    4. Using ............................................... |debugpy-using|
+    5  Included adapters ................................... |debugpy-adapter|
+    6. Debugpy API ......................................... |debugpy-api|
+    7. Further reading ..................................... |debugpy-seealso|
 
 
 ==============================================================================
 INTRODUCTION                                                   *debugpy-intro*
+
 
 Debugpy is a Python debug adapter server which implements the server side of
 the Debug Adapter Protocol (DAP). The nvim-dap plugin (|dap.txt|) is a Neovim
@@ -46,14 +48,36 @@ into your workflow.
 
 
 ==============================================================================
-SETUP AND CONFIGURATION                                        *debugpy-setup*
+SETUP AND FIRST STEPS                                          *debugpy-setup*
 
-Install debugpy.nvim like any other Neovim plugin. Make sure that nvim-dap and
-Debugpy are already working on your system.
 
-                                                              *debugpy-launch*
-We can try it out with a simple Python script. Create a new Python module
-named `main.py` with the following contents:
+Install debugpy.nvim like any other Neovim plugin. Make sure that nvim-dap
+(Neovim plugin) and debugpy (Python package) are already working on your
+system.
+
+To try out the debugpy Python package you can launch it from your shell, e.g.
+like this:
+>
+    python -m debugpy
+<
+
+
+==============================================================================
+TUTORIAL                                                    *debugpy-tutorial*
+
+This tutorial will guide you through the process of debugging a simple toy
+example. You will debug a standalone script, a snippet of code, and finally
+attach to a running process. Prerequisite knowledge:
+
+- How to program in Python
+- Using the nvim-dap for debugging
+
+
+-------------------------------------------------------------------------------
+LAUNCHING A PROCESS                                            *debugpy-launch*
+                                                              
+We can try debugging a simple Python script. Create a new Python module named
+`main.py` with the following contents:
 >
     def add(x, y):
         """Recursively add two positive numbers"""
@@ -64,14 +88,16 @@ named `main.py` with the following contents:
 
     if __name__ == '__main__':
         x, y = 2, 3
-        print(f'The sum of {x} and {y} is {add(x, y)}.')
+        sum = add(x, y)
+        print(f'The sum of {x} and {y} is {sum}.')
 <
-Make sure Debugpy is installed in your environment. Open the script in Neovim,
-create a breakpoint (see |dap.set_breakpoint()|) somewhere (e.g. line 3) and
-execute the `:Debugpy module main` command. The debugger will run the module
-and stop at your breakpoint.
+Make sure the `debugpy` Python package is available in your environment. Open
+the script in Neovim, create a breakpoint (see |dap.set_breakpoint()|)
+somewhere (e.g. line 3) and execute the `:Debugpy module main` command. The
+debugger will run the module and stop at your breakpoint.
 
-                                                              *debugpy-attach*
+-------------------------------------------------------------------------------
+ATTACHING TO A RUNNING PROCESS                                 *debugpy-attach*
 
 It is possible to attach the debugger to a running process through the
 sub-command |:Debugpy-attach|. To try it out create a new Python module named
@@ -105,7 +131,10 @@ the Debugpy command line reference for more information. Example:
     # Debug module 'main' with arguments 'foo' and 'bar'
     python -m debugpy --listen 5678 -m main foo bar
 <
-                                                                 *debugpy-ssh*
+
+
+-------------------------------------------------------------------------------
+ATTACHING TO REMOTE PROCESS                                       *debugpy-ssh*
 
 It is possible to debug a process running on a remote machine following the
 above instructions as long as you have local port forwarding set up. When
@@ -248,7 +277,7 @@ See |dap-adapter| for more information on adapters.
 
 
 ==============================================================================
-API                                                              *debugpy-api*
+DEBUGPY API                                                      *debugpy-api*
 
 Debugpy is hackable, you can customize the default of debugpy.nvim by settings
 the values within its public module `debugpy`.
@@ -405,6 +434,7 @@ Example: Lua
 
 ==============================================================================
 FURTHER READING                                              *debugpy-seealso*
+
 
 Offical Debugpy website:
     https://github.com/microsoft/debugpy
