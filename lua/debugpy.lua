@@ -25,7 +25,6 @@ M.subcommand = {
 		end,
 	},
 	program = {
-		arity = {min = 0},
 		configure = function(program, ...)
 			return make_config {
 				name = string.format('Python program \'%s\'', program),
@@ -116,7 +115,8 @@ function M.configure(subcommand, ...)
 	end
 
 	local args = {...}
-	local min_args, max_args = entry.arity.min, entry.arity.max
+	local arity = entry.arity or {}
+	local min_args, max_args = arity.min or 0, arity.max
 	if #args < min_args then
 		error(string.format(
 			'Debugpy: %s: not enough arguments, needs at least %d, got %d',

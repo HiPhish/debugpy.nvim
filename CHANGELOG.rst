@@ -17,6 +17,9 @@ Unreleased
 Changed
    - User manual topics restructured to be more discoverable
 
+Added
+   - Arity of custom sub-commands is optional and defaults to `{min=0,
+     max=nil}`
 
 0.6.0 - 2022-08-07
 ##################

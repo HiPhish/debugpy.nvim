@@ -408,20 +408,22 @@ specification.
 
 Each specification has the following entries:
 
-    'arity'      A table or dictionary describing the arity of the
-                 sub-command; the entry 'min' is mandatory, the entry 'max' is
-                 optional (unlimited upper arity if omitted). If both values
-                 are the same the arity is fixed.
+    'arity'      Optional, default is `{}`. A table or dictionary describing
+                 the arity of the sub-command. the entry 'min' is optional and
+                 defaults to `0`, the entry 'max' is optional (unlimited upper
+                 arity if omitted). If both values are the same the arity is
+                 fixed. Both values are inclusive.
 
     'configure'  A function which takes the arguments (as strings) from the
                  sub-command and returns a configuration table according to
                  |dap-configuration|
 
-    'complete'   A function which takes a list of string arguments to complete
-                 the subcommand and a boolean whether the current argument is
-                 incomplete, returns a list of completion candidates. The
-                 arguments are the same arguments which are being passed to
-                 the `:Debugpy` command following the subcommand.
+    'complete'   Optional, default is no completion. A function which takes a
+                 list of string arguments to complete the subcommand and a
+                 boolean whether the current argument is incomplete, returns a
+                 list of completion candidates. The arguments are the same
+                 arguments which are being passed to the `:Debugpy` command
+                 following the subcommand.
 
 You can define sub-commands in either Vim script or Lua, both work equally. If
 a subcommand in defined in both it is undefined which one will be chosen.
@@ -442,7 +444,7 @@ Example: Lua
 
     -- Variable arity, completion function
     local program = {
-        arity = {min = 0},
+        -- Default arity is {} which is the same as {min=0, max=nil}
         configure = function(program, ...)
             return {
                 type = 'debugpy_executable',
