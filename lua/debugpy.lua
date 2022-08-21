@@ -2,77 +2,26 @@
 ---this table to customize the behaviour.
 local M = {}
 local dap = require 'dap'
-
-local base_config = {
-	type = 'debugpy_executable',
-	request = 'launch',
-}
-
-local function make_config(config)
-	return vim.tbl_extend('keep', config, base_config)
-end
+local config = require 'debugpy.configuration'
 
 ---Dispatch table, maps a subcommand to its specification.
 M.subcommand = {
 	module = {
 		arity = {min = 1},
-		configure = function(module, ...)
-			return make_config {
-				name = string.format('Python module \'%s\'', module),
-				module = module,
-				args = {...}
-			}
-		end,
+		configure = config.module,
 		complete = require 'debugpy.completion.module',
 	},
 	program = {
-		configure = function(program, ...)
-			return make_config {
-				name = string.format('Python program \'%s\'', program),
-				program = program or '${file}',
-				args = {...},
-			}
-		end,
-		complete = function(args, pending)
-			if #args > 1 or (#args == 1 and not pending) then
-				return {}
-			end
-			local result = vim.fn.getcompletion(args[1] or '', 'file')
-			for i, v in ipairs(result) do
-				result[i] = vim.fn.escape(v, ' \\')
-			end
-			return result
-		end
+		configure = config.program,
+		complete = require 'debugpy.completion.program'
 	},
 	code = {
 		arity = {min = 1, max = 1},
-		configure = function(code)
-			return {
-				type = 'debugpy_executable',
-				request = 'launch',
-				code = code
-			}
-		end
+		configure = config.code,
 	},
 	attach = {
 		arity = {min = 2, max = 2},
-		configure = function(host, port)
-			return make_config {
-				type = 'debugpy_server',
-				-- type = 'debugpy_executable',
-				name = string.format('Remote process at \'%s@%s\'', host, port),
-				request = 'attach',
-				host = host,
-				port = port + 0,  -- Coerce to number
-				-- Maps between local and remote working directories
-				pathMappings = {
-					{  -- Map Neovim working directory to debuggee working directory
-						localRoot = '${workspaceFolder}',
-						remoteRoot = '.'
-					}
-				},
-			}
-		end
+		configure = config.attach,
 	},
 	-- Disbled for now; it would be better to support the launch.json file from
 	-- VSCode
