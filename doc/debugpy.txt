@@ -419,11 +419,9 @@ Each specification has the following entries:
                  |dap-configuration|
 
     'complete'   Optional, default is no completion. A function which takes a
-                 list of string arguments to complete the subcommand and a
-                 boolean whether the current argument is incomplete, returns a
-                 list of completion candidates. The arguments are the same
-                 arguments which are being passed to the `:Debugpy` command
-                 following the subcommand.
+                 list of strings (current arguments to the subcommand) and a
+                 boolean (whether the current argument is incomplete), returns
+                 a list of completion candidates.
 
 You can define sub-commands in either Vim script or Lua, both work equally. If
 a subcommand in defined in both it is undefined which one will be chosen.
