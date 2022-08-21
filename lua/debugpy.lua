@@ -23,6 +23,7 @@ M.subcommand = {
 				args = {...}
 			}
 		end,
+		complete = require 'debugpy.completion.module',
 	},
 	program = {
 		configure = function(program, ...)
