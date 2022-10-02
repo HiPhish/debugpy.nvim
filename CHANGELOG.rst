@@ -16,6 +16,7 @@ Unreleased
 
 Changed
    - User manual topics restructured to be more discoverable
+   - Put two spaces after each sentence in the manual (like Vim does)
 
 Added
    - Arity of custom sub-commands is optional and defaults to `{min=0,

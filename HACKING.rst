@@ -10,9 +10,9 @@ Module path completion
 ######################
 
 The module path completion of the `:Debugpy module` subcommand is a naive
-re-implementation of the way Python looks  for modules. I was deliberating
+re-implementation of the way Python looks  for modules.  I was deliberating
 whether to implement completion as a Python remote plugin using the `importlib`
-and `pkgutil` or whether to write a re-implementation in Lua. Eventually I
+and `pkgutil` or whether to write a re-implementation in Lua.  Eventually I
 decided to go with the latter.
 
 Remote plugin considerations
@@ -51,8 +51,8 @@ Conclusion
 ==========
 
 In the end the fact that Python has to actually load packages (executable code)
-in order to find submodules made me go with Lua. An editor plugin should never
-implicitly load executable code from its working directory. While it is very
+in order to find submodules made me go with Lua.  An editor plugin should never
+implicitly load executable code from its working directory.  While it is very
 unlikely that an attacker would exploit this, I prefer erring on the side of
 caution.
 
