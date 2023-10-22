@@ -22,6 +22,7 @@ Added
      max=nil}`
    - Module completion in `:Debugpy module` subcommand
 
+
 0.6.0 - 2022-08-07
 ##################
 
