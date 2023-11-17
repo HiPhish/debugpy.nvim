@@ -8,5 +8,5 @@ def test_naive_add(x: int, y: int):
 
 
 @pytest.mark.parametrize('x,y', [(2, 3), (0, 4), (7, 0)])
-def test_naive_add(x: int, y: int):
+def test_loop_add(x: int, y: int):
     assert x + y == loop_add(x, y)
