@@ -27,6 +27,8 @@ TABLE OF CONTENTS                                           *debugpy-contents*
     4. Using ............................................ |debugpy-using|
        4.1 The Debugpy command .......................... |:Debugpy|
        4.2 Included adapters ............................ |debugpy-adapter|
+    5. Recipes  ......................................... |debugpy-recipes|
+       5. Django......................................... |debugpy-django|
     6. Debugpy API ...................................... |debugpy-api|
        6.1 Variables .................................... |debugpy-api-vars|
        6.2 Running the debugger ......................... |debugpy-api-run|
@@ -285,6 +287,23 @@ an adapter with that name.
     `debugpy_server`      |debugpy.adapter.executable| 
 
 See |dap-adapter| for more information on adapters.
+
+
+==============================================================================
+RECIPES                                                      *debugpy-recipes*
+
+This is a collection of exceptional of otherwise noteworthy use-cases for
+debugging Python.
+
+
+------------------------------------------------------------------------------
+DJANGO                                                        *debugpy-django*
+
+In my experience debugging Django does not work if module reloading is
+enabled.  We have to start the server with the `--noreload` option.
+>vim
+    Debugpy program manage.py runserver --noreload
+<
 
 
 ==============================================================================
