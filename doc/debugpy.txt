@@ -43,9 +43,9 @@ Debugpy.nvim provides the |:Debugpy| command which will create the appropriate
 debugger configurations for you and launch the debugger.  You do not have to
 set up Debugpy yourself.
 
-Only launching the debugger is covered, it is up to your own configuration how
-to use the debugger once it is running.  This allows debugpy.nvim to integrate
-into your workflow.
+Only configuring and launching the debugger is covered, it is up to your own
+nvim-dap configuration how to use the debugger once it is running.  This
+allows debugpy.nvim to integrate into your existing workflow.
 
 
 ==============================================================================
@@ -70,15 +70,15 @@ This tutorial will guide you through the process of debugging a simple toy
 example.  You will debug a standalone script, a snippet of code, and finally
 attach to a running process.  Prerequisite knowledge:
 
-- How to program in Python
-- Using the nvim-dap for debugging
+  - How to program in Python
+  - Using the nvim-dap plugin for debugging (|dap.txt|)
 
 
 -------------------------------------------------------------------------------
 LAUNCHING A PROCESS                                            *debugpy-launch*
                                                               
-We can try debugging a simple Python script.  Create a new Python module named
-`main.py` with the following contents:
+We can try debugging a simple Python script.  Create a new Python script file
+named `main.py` with the following contents:
 >python
     def add(x, y):
         """Recursively add two positive numbers"""
@@ -94,19 +94,25 @@ We can try debugging a simple Python script.  Create a new Python module named
 <
 Make sure the `debugpy` Python package is available in your environment.  Open
 the script in Neovim, create a breakpoint (see |dap.set_breakpoint()|)
-somewhere (e.g. line 3) and execute the `:Debugpy module main` command.  The
-debugger will run the module and stop at your breakpoint.
+somewhere (e.g. on line 3) and execute the `:Debugpy module main` command.
+The debugger will run the module and stop at your breakpoint.
 
 -------------------------------------------------------------------------------
 ATTACHING TO A RUNNING PROCESS                                 *debugpy-attach*
 
 It is possible to attach the debugger to a running process through the
-sub-command |:Debugpy-attach|.  To try it out create a new Python module named
-`server.py` with the following contents:
+sub-command |:Debugpy-attach|.  We can either write a script that useses the
+`debugpy` package internally or we can launch a regular script through the
+`debugpy` module.
+
+
+Using the debugpy package internally ~
+
+Create a new Python module named `server.py` with the following contents:
 >python
-    import time
-    import random
     import debugpy
+    from random import randint
+    from time import sleep
 
     (host, port) = debugpy.listen(5678)
 
@@ -114,16 +120,19 @@ sub-command |:Debugpy-attach|.  To try it out create a new Python module named
 
     if __name__ == '__main__':
         while True:
-            x, y = random.randint(1, 10), random.randint(1, 10)
+            x, y = randint(1, 10), randint(1, 10)
             print(f'The sum of {x} and {y} is {x + y}.')
-            time.sleep(1)
+            sleep(1)
 <
-Now launch this script from the shell and you will have an endlessly running
+Now launch this script from the shell and you will have an perpetually running
 Python process.  Open the script in Neovim (in another shell), set your
 breakpoint somewhere inside the loop (e.g. line 13), then execute the
 `:Debugpy attach 127.0.0.1 5678` command (you do have to spell out the IP, you
 cannot write `localhost`).  The debugger will stop at your breakpoint on the
 next loop iteration.
+
+
+Launching a script through debugpy externally ~
 
 It is also possible to listen for DAP clients without modifying the source
 code by launching the Python program through Debugpy itself.  Please refer to
@@ -135,9 +144,9 @@ the Debugpy command line reference for more information.  Example:
 
 
 -------------------------------------------------------------------------------
-ATTACHING TO REMOTE PROCESS                                       *debugpy-ssh*
+ATTACHING TO A REMOTE PROCESS                                     *debugpy-ssh*
 
-It is possible to debug a process running on a remote machine following the
+It is possible to debug a process running on a remote machine by following the
 above instructions as long as you have local port forwarding set up.  When
 attaching specify `127.0.0.1` as the host and the forwarded port as the port.
 
@@ -146,9 +155,9 @@ Example:
     # In one shell connect to the remote machine
     ssh -L 5678:localhost:5678 user@remote
     # Navigate to the project on the remote machine
-    cd /home/jdoe/projects/my-project/
+    cd my-project/
     # Run the program
-    python -m main
+    python -m debugpy --listen 5678 -m main foo bar
 <
 You can now use |:Debugpy-attach| to start the debugger on your local machine.
 It is important that both machines have the same source code and ideally the
@@ -175,33 +184,35 @@ THE DEBUGPY COMMAND                                                 *:Debugpy*
     the last invocation will be re-used.  This does not persist between Neovim
     sessions, you have to execute the command at least once with arguments.
 
+    Sub-commands: ~
     The following sub-commands are implemented by default:
 
-        - |:Debugpy-module|   Run a single Python module
-        - |:Debugpy-program|  Run a Python program
-        - |:Debugpy-code|     Run a code snippet
-        - |:Debugpy-attach|   Attach to a running Python process)
+       • |:Debugpy-module|   Run a single Python module
+       • |:Debugpy-program|  Run a Python program
+       • |:Debugpy-code|     Run a code snippet
+       • |:Debugpy-attach|   Attach to a running Python process)
 
     You can add your own sub-commands or modify the existing ones through the
     |debugpy-api|.
 
 
-------------------------------------------------------------------------------
-                                                             *:Debugpy-module*
-:Debugpy module {module} [{arg} ...]
+:Debugpy module {module} [{arg} ...]                         *:Debugpy-module*
 
     Debug a specific Python module.  The argument must be given the same way
     as if you were running via `python -m {module}` it from the command line.
     The remaining arguments are passed as command-line arguments to Python.
 
-    Example:
+    Arguments: ~
+      • {module}  Name of the module, as given to `import` in Python
+      • {arg}...  Command-line arguments to the module
+
+    Example: ~
 >vim
         Debugpy module main foo bar
 >
 
-------------------------------------------------------------------------------
-                                                            *:Debugpy-program*
-:Debugpy program [{program} [{arg} ...]]
+
+:Debugpy program [{program} [{arg} ...]]                    *:Debugpy-program*
 
     Debug a {program} given its absolute path or path relative to the current
     working directory.  The remaining {arg}s are passed as command-line
@@ -209,7 +220,11 @@ THE DEBUGPY COMMAND                                                 *:Debugpy*
 
     If the {program} is omitted the current file will be used as the program.
 
-    Example:
+    Arguments: ~
+      • {program}  Name of the script, as given to the shell
+      • {arg}...   Command-line arguments to the script
+
+    Example: ~
 >vim
         " Path relative to current working directory
         Debugpy program main.py foo bar
@@ -218,15 +233,17 @@ THE DEBUGPY COMMAND                                                 *:Debugpy*
         Debugpy program /home/jdoe/projects/my-project/main.py foo bar
 >
 
-------------------------------------------------------------------------------
-                                                               *:Debugpy-code*
-:Debugpy code {code}
+                   
+:Debugpy code {code}                                           *:Debugpy-code*
 
     Debug the given snippet of source code.  This is rather awkward to use
     from the command line because you need to escape all special characters
     (see |cmdline-special|).
 
-    Example:
+    Arguments: ~
+      • {code}  A Python code expression
+
+    Example: ~
 >vim
         " A code snippet which jumps straight into a function call
         Debugpy code from\ foo\ import\ bar;\ bar(1,\ 2)
@@ -234,37 +251,39 @@ THE DEBUGPY COMMAND                                                 *:Debugpy*
     This sub-command is much easier to use in the |debugpy-api|.  Here is the
     same example as above, but using the API instead.
 
-    Example: Vim script
+    Example (Vim script): ~
 >vim
         let conf = debugpy#configure('code', 'from foo import bar; bar(1, 2)')
         call debugpy#run(conf)
 <
-    Example: Lua
+    Example (Lua): ~
 >lua
         local debugpy = require 'debugpy'
-
         local conf = debugpy.configure('code', 'from foo import bar; bar(1, 2)')
         debugpy.run(conf)
 <
 
-------------------------------------------------------------------------------
-                                                             *:Debugpy-attach*
-:Debugpy attach {host} {port}
+
+:Debugpy attach {host} {port}                                *:Debugpy-attach*
 
     Attach to a running Python process which is listening for DAP clients.
     First you need to launch the process in a separate shell and have it
     listen for DAP client connections.  Once you know the {host} and {port} you
     can attach to the process.
 
-    Note
+    See |debugpy-attach| and |debugpy-ssh| for examples.
+
+    Note ~
         If the process is running on a remote you must be editing the same
         source code as what is running on the remote machine.
 
-    Note
+    Note ~
         You cannot use `localhost` as the host, you have to spell out the IP
         `127.0.0.1` instead.
 
-    See |debugpy-attach| and |debugpy-ssh| for examples.
+    Arguments: ~
+      • {host}  IP address of the host machine
+      • {port}  Network port on the host machine
 
 
 ------------------------------------------------------------------------------
@@ -275,9 +294,9 @@ adapters will be automatically registered.  For convenience the included
 adapters will be registered under the following names, unless there already is
 an adapter with that name.
 
-    `python`              |debugpy.adapter.executable| 
-    `debugpy_executable`  |debugpy.adapter.executable| 
-    `debugpy_server`      |debugpy.adapter.executable| 
+    • `python`              |debugpy.adapter.executable| 
+    • `debugpy_executable`  |debugpy.adapter.executable| 
+    • `debugpy_server`      |debugpy.adapter.executable| 
 
 See |dap-adapter| for more information on adapters.
 
