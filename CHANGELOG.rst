@@ -17,6 +17,7 @@ Unreleased
 Changed
    - User manual topics restructured to be more discoverable
    - Put two spaces after each sentence in the manual (like Vim does)
+   - Health check now requires Neovim 0.8 (see `:h vim.health`)
 
 Added
    - Arity of custom sub-commands is optional and defaults to `{min=0,
